@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b0e12" />
+    <meta
+      name="description"
+      content="JobQuest makes the job search feel doable: track applications, build momentum, and make your next move."
+    />
+    <title>JobQuest — Make your next move</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="side-rail">
+        <div class="brand-lockup">
+          <div class="brand-mark" aria-hidden="true">JQ</div>
+          <div>
+            <p class="brand-name">JobQuest</p>
+            <p class="brand-note">Your search, in motion.</p>
+          </div>
+        </div>
+
+        <nav class="main-nav" aria-label="Primary navigation">
+          <a class="nav-item is-active" href="#today"><span class="nav-icon">◒</span>Today</a>
+          <a class="nav-item" href="#tracker"><span class="nav-icon">↗</span>Application log</a>
+          <a class="nav-item" href="#due-today"><span class="nav-icon">!</span>Due today</a>
+          <a class="nav-item" href="#stats"><span class="nav-icon">▥</span>Role mix</a>
+          <a class="nav-item" href="#achievements"><span class="nav-icon">✦</span>Achievements</a>
+        </nav>
+
+        <div class="rail-footer">
+          <div class="focus-card">
+            <div class="focus-card-top">
+              <span class="status-dot"></span>
+              <span>Focus mode</span>
+            </div>
+            <p>One strong move beats an hour of perfecting the plan.</p>
+            <button class="text-button" type="button" data-open-next>Open next mission <span>→</span></button>
+          </div>
+          <div class="profile-chip">
+            <div class="avatar">AM</div>
+            <div>
+              <span class="profile-name">Alex Morgan</span>
+              <span class="profile-role">Product designer</span>
+            </div>
+            <span class="profile-more" aria-hidden="true">•••</span>
+          </div>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="breadcrumb"><span>JobQuest</span><span>/</span>Today</p>
+            <p class="date-line">Tuesday, August 25, 2026</p>
+          </div>
+          <div class="topbar-actions">
+            <button class="icon-button" type="button" aria-label="View notifications"><span class="notification-dot"></span>♢</button>
+            <div class="level-chip"><span class="level-label">LEVEL</span><strong id="level-number">04</strong><span class="level-divider"></span><span id="header-xp">540 XP</span></div>
+          </div>
+        </header>
+
+        <div class="page-content">
+          <section class="welcome-row" aria-labelledby="welcome-title">
+            <div>
+              <p class="eyebrow">MORNING BRIEF <span class="eyebrow-line"></span> 08:42 AM</p>
+            <h1 id="welcome-title">Start your <em>search</em> here.</h1>
+          </div>
+            <div class="welcome-actions"><button class="primary-button track-job-button" type="button" data-start-tracking>Track a job <span>↗</span></button><div class="streak-badge"><span class="flame">♨</span><span><strong id="streak-count">00</strong> day momentum</span></div></div>
+          </section>
+
+          <section class="overview-grid" id="today" aria-label="Today's job search overview">
+            <article class="quest-card">
+              <div class="quest-copy">
+                <div class="card-kicker"><span class="kicker-dot"></span> QUEST 01 <span class="kicker-rule"></span> TUESDAY</div>
+                <div class="quest-heading-row">
+                  <div>
+                    <h2>Today’s Job Search Quest</h2>
+                    <p class="quest-subtitle" id="quest-message">Three actions to keep the search moving.</p>
+                  </div>
+                  <span class="quest-status" id="quest-status">IN PROGRESS</span>
+                </div>
+                <div class="quest-progress-row">
+                  <div class="progress-track"><span id="quest-progress-bar"></span></div>
+                  <span class="progress-count"><strong id="quest-count">0</strong> / <span id="quest-total">1</span></span>
+                </div>
+                <div class="quest-footer">
+                  <div class="reward-note"><span class="spark">✦</span><span id="quest-reward">Track your first job for <strong>+50 XP</strong></span></div>
+                  <button class="primary-button" type="button" data-open-next>Open next mission <span>↗</span></button>
+                </div>
+              </div>
+              <div class="quest-orbit" aria-label="Quest progress">
+                <div class="orbit-ring orbit-ring-back"></div>
+                <div class="orbit-ring orbit-ring-progress" id="quest-orbit"></div>
+                <div class="orbit-ticks" aria-hidden="true"><span></span><span></span><span></span></div>
+                <div class="orbit-core"><span class="orbit-label">QUEST</span><strong id="orbit-count">00</strong><span class="orbit-label">OF <span id="orbit-total">01</span></span></div>
+                <span class="orbit-node node-one" data-orbit-node="1"></span>
+                <span class="orbit-node node-two" data-orbit-node="2"></span>
+                <span class="orbit-node node-three" data-orbit-node="3"></span>
+              </div>
+            </article>
+
+            <aside class="summary-panel">
+              <div class="panel-heading"><div><p class="eyebrow">SEARCH SNAPSHOT</p><h2>Your pipeline</h2></div><a href="#tracker" class="arrow-link">Open log <span>↗</span></a></div>
+              <div class="pipeline-total"><strong id="pipeline-total">0</strong><span id="pipeline-label">active opportunities</span></div>
+              <div class="mini-pipeline" id="mini-pipeline"></div>
+              <div class="snapshot-footer"><span class="up-arrow">↗</span><span><strong id="response-rate">33%</strong> response rate</span><span class="muted-dot"></span><span>last 30 days</span></div>
+            </aside>
+          </section>
+
+          <section class="section-block" aria-labelledby="missions-title">
+            <div class="section-heading"><div><p class="eyebrow">THE WORK THAT COUNTS</p><h2 id="missions-title">Your missions for today</h2></div><span class="section-meta"><span id="mission-action-count">1</span> job-search action<span id="mission-action-plural"> </span><span class="meta-rule"></span> <span id="mission-xp-label">50 XP available</span></span></div>
+            <div class="mission-grid" id="mission-grid"></div>
+          </section>
+
+          <section class="lower-grid" id="overview">
+            <article class="surface-card pipeline-card">
+              <div class="panel-heading"><div><p class="eyebrow">APPLICATION LOG</p><h2>Pipeline health</h2></div><a href="#tracker" class="arrow-link">View all <span>↗</span></a></div>
+              <div class="pipeline-stages" id="pipeline-stages"></div>
+              <div class="pipeline-note"><span class="note-mark" id="pipeline-note-mark">!</span><p><strong id="pipeline-note-title">Start with one real opportunity.</strong> <span id="pipeline-note-copy">Paste a job post and JobQuest will build your pipeline from there.</span></p><button class="mini-arrow" id="pipeline-note-action" type="button" data-start-tracking aria-label="Open next job-search mission">↗</button></div>
+            </article>
+
+            <article class="surface-card stats-card" id="stats">
+              <div class="panel-heading"><div><p class="eyebrow">YOUR SEARCH, BY THE NUMBERS</p><h2>Role mix</h2></div><span class="range-chip">LAST 30 DAYS <span>⌄</span></span></div>
+              <div class="big-stat-row"><div><strong id="application-count">0</strong><span>applications</span></div><div><strong id="interview-count">00</strong><span>interviews</span></div><div><strong id="followup-count">00</strong><span>follow-ups</span></div></div>
+              <div class="role-bars" id="role-bars"></div>
+            </article>
+          </section>
+
+          <section class="section-block due-block" id="due-today" aria-labelledby="due-title">
+            <div class="section-heading"><div><p class="eyebrow">KEEP THE THREAD MOVING</p><h2 id="due-title">Due today</h2></div><span class="section-meta"><span id="due-count">0</span> actions due <span class="meta-rule"></span> make the next move</span></div>
+            <article class="surface-card due-card"><div id="due-list"></div></article>
+          </section>
+
+          <section class="section-block log-block" id="tracker" aria-labelledby="log-title">
+            <div class="section-heading"><div><p class="eyebrow">YOUR OPPORTUNITIES, IN ONE PLACE</p><h2 id="log-title">Application log</h2></div><span class="section-meta"><span id="log-count">0</span> tracked roles <span class="meta-rule"></span> keep the thread</span></div>
+            <article class="surface-card log-card">
+              <div class="log-toolbar">
+                <label class="log-search"><span aria-hidden="true">⌕</span><span class="visually-hidden">Search tracked roles</span><input id="log-search" type="search" placeholder="Search by role or company" /></label>
+                <label class="log-filter"><span>SHOW</span><select id="log-filter" aria-label="Filter application log"><option value="all">All opportunities</option><option value="active">Active pipeline</option><option value="Saved">Saved</option><option value="Referral">Referral</option><option value="Applied">Applied</option><option value="Screen">Screen</option><option value="Interview">Interview</option></select></label>
+              </div>
+              <div class="job-log" id="job-log"></div>
+            </article>
+          </section>
+
+          <section class="section-block achievements-block" id="achievements" aria-labelledby="achievements-title">
+            <div class="section-heading"><div><p class="eyebrow">PROOF OF PROGRESS</p><h2 id="achievements-title">Achievements</h2></div><span class="section-meta"><span id="achievement-count">0</span> of 6 unlocked <span class="meta-rule"></span> Keep going</span></div>
+            <div class="achievement-grid" id="achievement-grid"></div>
+          </section>
+
+          <footer class="page-footer"><span>JobQuest / search in motion</span><span>Progress saves in this browser · <button class="footer-reset" id="load-demo" type="button">Load demo data</button> · <button class="footer-reset" id="reset-demo" type="button">Start fresh</button></span></footer>
+        </div>
+      </main>
+    </div>
+
+    <dialog class="mission-dialog" id="mission-dialog" aria-labelledby="dialog-title">
+      <div class="dialog-head"><div><p class="eyebrow" id="dialog-kicker">START A MISSION</p><h2 id="dialog-title">Track this job</h2></div><button class="close-button" type="button" data-close-dialog aria-label="Close dialog">×</button></div>
+      <p class="dialog-intro" id="dialog-intro">Paste the job post you’re applying for. JobQuest will keep the opportunity connected to your progress.</p>
+      <form id="mission-form">
+        <div class="capture-fields" id="capture-fields">
+          <label class="field-label" for="job-url">Job post URL <span>required</span><input id="job-url" name="job-url" type="url" placeholder="https://company.com/careers/role" autocomplete="url" /><small id="url-error" class="field-error"></small></label>
+          <div class="field-grid"><label class="field-label" for="job-title">Job title<input id="job-title" name="job-title" type="text" placeholder="Product Designer" /></label><label class="field-label" for="company-name">Company<input id="company-name" name="company-name" type="text" placeholder="Notion" /></label></div>
+          <div class="field-grid"><div class="field-combo"><label class="field-label" for="role-category">Role category<select id="role-category" name="role-category"><option value="Product Design">Product Design</option><option value="UX/UI Design">UX/UI Design</option><option value="UX Research">UX Research</option><option value="Visual &amp; Brand Design">Visual &amp; Brand Design</option><option value="Graphic Design">Graphic Design</option><option value="Content Design">Content Design</option><option value="Motion Design">Motion Design</option><option value="Design Leadership">Design Leadership</option><option value="Product Management">Product Management</option><option value="Engineering &amp; Development">Engineering &amp; Development</option><option value="Marketing &amp; Growth">Marketing &amp; Growth</option><option value="Sales &amp; Business Development">Sales &amp; Business Development</option><option value="Customer Success">Customer Success</option><option value="Data &amp; Analytics">Data &amp; Analytics</option><option value="Operations">Operations</option><option value="Finance &amp; Accounting">Finance &amp; Accounting</option><option value="People &amp; Recruiting">People &amp; Recruiting</option><option value="Other">Other</option><option value="custom">+ Add custom category…</option></select></label><label class="field-label custom-category-field" id="custom-category-wrap" for="custom-role-category" hidden>Custom category<input id="custom-role-category" name="custom-role-category" type="text" placeholder="e.g. Community Manager" /><small id="category-error" class="field-error"></small></label></div><label class="field-label" for="job-location">Location<input id="job-location" name="job-location" type="text" placeholder="Remote" /></label></div>
+          <label class="field-label" for="job-source">Where did you find it?<select id="job-source" name="job-source"><option value="Company site">Company careers page</option><option value="LinkedIn">LinkedIn</option><option value="Indeed">Indeed</option><option value="Glassdoor">Glassdoor</option><option value="Wellfound">Wellfound</option><option value="Built In">Built In</option><option value="Dice">Dice</option><option value="Handshake">Handshake</option><option value="Referral">Referral</option><option value="Recruiter outreach">Recruiter outreach</option><option value="Other">Other</option></select></label>
+          <div class="field-grid"><label class="field-label" for="job-next-action">Next action<select id="job-next-action" name="job-next-action"><option value="Apply">Apply</option><option value="Tailor résumé">Tailor résumé</option><option value="Send referral message">Send referral message</option><option value="Follow up with recruiter">Follow up with recruiter</option><option value="Prepare interview">Prepare interview</option><option value="Thank interviewer">Thank interviewer</option><option value="Research company">Research company</option><option value="Other">Other</option></select></label><label class="field-label" for="job-due-date">Due date<input id="job-due-date" name="job-due-date" type="date" /></label></div>
+          <label class="field-label" for="job-notes">Notes<textarea id="job-notes" name="job-notes" rows="3" placeholder="What do you want to remember about this opportunity?"></textarea></label>
+        </div>
+        <div class="select-fields" id="select-fields" hidden><label class="field-label" for="existing-job">Choose the opportunity<select id="existing-job" name="existing-job"></select></label><div class="selected-job-preview" id="selected-job-preview"></div></div>
+        <div class="dialog-actions"><button class="secondary-button" type="button" data-close-dialog>Cancel</button><button class="primary-button" type="submit" id="dialog-submit">Start mission <span>↗</span></button></div>
+      </form>
+    </dialog>
+    <dialog class="mission-dialog job-edit-dialog" id="job-edit-dialog" aria-labelledby="edit-dialog-title">
+      <div class="dialog-head"><div><p class="eyebrow">EDIT OPPORTUNITY</p><h2 id="edit-dialog-title">Update this job</h2></div><button class="close-button" type="button" data-close-edit-dialog aria-label="Close edit dialog">×</button></div>
+      <p class="dialog-intro">Keep the details current so your next action stays visible and useful.</p>
+      <form id="job-edit-form">
+        <label class="field-label" for="edit-job-url">Job post URL<input id="edit-job-url" name="edit-job-url" type="url" autocomplete="url" /><small id="edit-url-error" class="field-error"></small></label>
+        <div class="field-grid"><label class="field-label" for="edit-job-title">Job title<input id="edit-job-title" name="edit-job-title" type="text" /></label><label class="field-label" for="edit-company-name">Company<input id="edit-company-name" name="edit-company-name" type="text" /></label></div>
+        <div class="field-grid"><label class="field-label" for="edit-role-category">Role category<input id="edit-role-category" name="edit-role-category" type="text" /></label><label class="field-label" for="edit-job-location">Location<input id="edit-job-location" name="edit-job-location" type="text" /></label></div>
+        <div class="field-grid"><label class="field-label" for="edit-job-next-action">Next action<select id="edit-job-next-action" name="edit-job-next-action"><option value="Apply">Apply</option><option value="Tailor résumé">Tailor résumé</option><option value="Send referral message">Send referral message</option><option value="Follow up with recruiter">Follow up with recruiter</option><option value="Prepare interview">Prepare interview</option><option value="Thank interviewer">Thank interviewer</option><option value="Research company">Research company</option><option value="Other">Other</option></select></label><label class="field-label" for="edit-job-due-date">Due date<input id="edit-job-due-date" name="edit-job-due-date" type="date" /></label></div>
+        <label class="field-label" for="edit-job-source">Source<select id="edit-job-source" name="edit-job-source"><option value="Company site">Company careers page</option><option value="LinkedIn">LinkedIn</option><option value="Indeed">Indeed</option><option value="Glassdoor">Glassdoor</option><option value="Wellfound">Wellfound</option><option value="Built In">Built In</option><option value="Dice">Dice</option><option value="Handshake">Handshake</option><option value="Referral">Referral</option><option value="Recruiter outreach">Recruiter outreach</option><option value="Other">Other</option></select></label>
+        <label class="field-label" for="edit-job-stage">Pipeline stage<select id="edit-job-stage" name="edit-job-stage"><option>Saved</option><option>Referral</option><option>Applied</option><option>Screen</option><option>Interview</option><option>Offer</option><option>Closed</option></select></label>
+        <label class="field-label" for="edit-job-notes">Notes<textarea id="edit-job-notes" name="edit-job-notes" rows="3"></textarea></label>
+        <div class="dialog-actions"><button class="secondary-button" type="button" data-close-edit-dialog>Cancel</button><button class="primary-button" type="submit">Save changes <span>↗</span></button></div>
+      </form>
+    </dialog>
+    <div class="toast" id="toast" role="status" aria-live="polite"><span class="toast-icon">✦</span><span id="toast-message">Mission updated</span></div>
+    <script src="app.js?v=9"></script>
+  </body>
+</html>
