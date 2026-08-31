@@ -2,7 +2,7 @@
 
 **A job-search accountability dashboard that turns applications, networking, and follow-ups into focused missions.**
 
-![JobQuest dashboard](jobquest/jobquest-full-page.png)
+![JobQuest dashboard](jobquest-full-page.png)
 
 JobQuest is a responsive front-end prototype for people who want the job search to feel more visible, motivating, and manageable. It helps a job seeker track real opportunities, decide on the next action, and build momentum without becoming another generic task app.
 
@@ -27,13 +27,12 @@ JobQuest is a responsive front-end prototype for people who want the job search 
 The prototype has no build step and no dependency install is required.
 
 ```powershell
-cd jobquest
 python -m http.server 4173
 ```
 
 Then open [http://localhost:4173](http://localhost:4173).
 
-If Python is not available, serve the `jobquest` folder with any static HTTP server. Opening `index.html` directly may work in some browsers, but an HTTP server is the reliable option.
+If Python is not available, serve the repository root with any static HTTP server. Opening `index.html` directly may work in some browsers, but an HTTP server is the reliable option.
 
 ## Try the main flow
 
@@ -50,7 +49,7 @@ For a guided walkthrough, select **Load demo data** in the footer. Select **Star
 
 ## Development checks
 
-From the `jobquest` folder:
+From the repository root:
 
 ```powershell
 npm run lint
@@ -68,14 +67,14 @@ The demo records use example URLs and fictional sample opportunities. They are i
 
 ```text
 .
-├── README.md
-└── jobquest/
-    ├── index.html                 # App shell and accessible markup
-    ├── styles.css                 # Visual system and responsive layout
-    ├── app.js                     # State, rendering, persistence, and interactions
-    ├── DESIGN.md                  # Product, UX, visual, and validation decisions
-    ├── package.json               # Minimal local validation script
-    └── jobquest-full-page.png     # Current visual reference
+├── README.md                      # Project overview and setup
+├── DESIGN.md                      # Product, UX, visual, and validation decisions
+├── index.html                     # App shell and accessible markup
+├── styles.css                     # Visual system and responsive layout
+├── app.js                         # State, rendering, persistence, and interactions
+├── package.json                   # Minimal local validation script
+├── package-lock.json              # Reproducible npm audit metadata
+└── jobquest-full-page.png         # Current visual reference
 ```
 
 ## Product direction
@@ -84,4 +83,4 @@ The core promise is: **make the job search easier to do, not just easier to orga
 
 The next product-level step is validating the flow with real job seekers. The next technical step after that would be authenticated cloud persistence, followed by reminders and optional job-post metadata extraction.
 
-More detailed product decisions and the current validation checklist live in [`jobquest/DESIGN.md`](jobquest/DESIGN.md).
+More detailed product decisions and the current validation checklist live in [`DESIGN.md`](DESIGN.md).

@@ -12,7 +12,7 @@
 
 ## Assumptions and constraints
 
-- The app will live in a new `jobquest` folder inside the workspace.
+- The app lives at the repository root so local development and static hosting can use the default directory.
 - V1 has no authentication, backend, cloud storage, real URL scraping, or external API calls.
 - Job data can be captured through a pasted URL and a short form; the prototype can simulate metadata for realistic sample opportunities.
 - User-entered state persists locally in the browser under the `jobquest-state-v2` localStorage key; optional sample content can be loaded with a Load demo data control.
