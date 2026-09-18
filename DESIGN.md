@@ -14,10 +14,10 @@
 
 - The app lives at the repository root so local development and static hosting can use the default directory.
 - V1 has no authentication, backend, cloud storage, real URL scraping, or external API calls.
-- Job data can be captured through a pasted URL and a short form; the prototype can simulate metadata for realistic sample opportunities.
-- User-entered state persists locally in the browser under the `jobquest-state-v2` localStorage key; optional sample content can be loaded with a Load demo data control.
+- Job data is captured through a pasted URL and a short form. Optional demo data supplies realistic sample opportunities; the prototype does not parse or scrape the pasted URL.
+- User-entered state persists locally in the browser under the `jobquest-state-v2` localStorage key; optional sample content can be loaded with a Load demo data control. JSON backups can be exported to and imported from the user’s device.
 - The experience should be fast-loading, responsive, and maintainable at prototype scale.
-- No personal job-seeker data is required; all visible records are fictional sample data.
+- No sensitive personal data is required. Demo records are fictional, while user-entered opportunity data stays in the current browser.
 - The working product name is **JobQuest** with the tagline **Turn the job search into your next win.**
 
 ## Product direction
@@ -57,14 +57,17 @@ For an Apply mission, the user pastes the job-post URL into a capture panel. The
 - Role category from a broad preset list, with custom categories saved for reuse
 - Location or remote status
 - Source: company careers page, job boards, referrals, recruiter outreach, or other
-- Current stage
+- Next action, due date, application date, and notes
+- Current pipeline stage, defaulting to Saved for a new opportunity; historical entries can start at Applied or a later stage
+
+New opportunities default to the Saved stage. When backfilling a job already submitted, the user can choose Applied or a later stage and enter the actual application date; JobQuest logs that historical activity without retroactive XP.
 
 Existing tracked jobs can be selected for Network and Follow-up missions so the same opportunity is not repeatedly re-entered.
 
 Mission states:
 
 - **Not started:** action context, opportunity details, time estimate, and clear CTA.
-- **Active:** focused card, lightweight timer, and “Mark complete” CTA.
+- **Active:** focused card, time estimate, and “Mark complete” CTA.
 - **Completed:** job-specific completion message, XP earned, and subdued styling.
 - **Quest complete:** XP summary, streak update, and an optional next move.
 - **Empty:** “You’re done for today” state when no missions remain.
@@ -76,10 +79,9 @@ The prototype tracks:
 - Total applications
 - Response rate
 - Most-applied role categories
-- Applications by source
 - Current pipeline count
 - Follow-ups completed
-- Weekly job-search activity
+- Interviews reached
 
 Achievements reward meaningful patterns rather than arbitrary clicks:
 
@@ -88,13 +90,13 @@ Achievements reward meaningful patterns rather than arbitrary clicks:
 - **Referral Builder**
 - **Follow-Up Finisher**
 - **Interview Ready**
-- **Design Role Explorer**
+- **Role Explorer**
 
 XP and streaks are compact signals around the workflow; they should not dominate the dashboard.
 
 ## Application Log
 
-The Application Log is the durable home for tracked opportunities. It supports searching by role, company, next action, or notes; filtering by pipeline stage; viewing the source and tracked date; opening the saved job post; changing the current stage; and editing job details. Each job can carry a next action, due date, and personal notes. Stage and detail changes update the dashboard and persist locally so the tracker reflects the user’s real search history.
+The Application Log is the durable home for tracked opportunities. It supports searching by role, company, next action, notes, or application date; filtering by pipeline stage; viewing the source, application date, and tracked date; opening the saved job post; changing the current stage; and editing job details. Each job can carry a next action, due date, application date, and personal notes. Stage and detail changes update the dashboard and persist locally so the tracker reflects the user’s real search history.
 
 The Due today view surfaces tracked jobs whose next action is scheduled for the current date, giving the user a short list to act on instead of another passive report.
 
@@ -104,18 +106,22 @@ New users start with an empty application log, zeroed stats, locked achievements
 
 ## Current implementation status
 
-The current prototype supports the complete local interaction loop:
+The current prototype supports the complete browser-local interaction loop:
 
 - Track an opportunity from a pasted URL.
 - Choose a preset role category or save a custom category for reuse.
+- Backfill an existing application with its current stage and actual application date, including through the edit dialog.
 - Record the source, next action, due date, and notes.
 - Create connected Network and Follow up missions around the tracked job.
 - Complete missions to update XP, streak, pipeline, and achievements.
-- Search and filter the Application Log, change a pipeline stage, edit job details, and open the saved post.
+- Search and filter the Application Log, change a pipeline stage, edit job details including application date, and open the saved post.
 - Review jobs due today and inspect role mix and search statistics.
 - Reload the page and continue from the saved browser-local state.
+- Export a complete JSON backup and import it after local validation and a replace confirmation.
 
 This remains a front-end-only prototype. Authentication, cloud sync, notifications, real URL metadata extraction, job-board search, and application submission are intentionally out of scope for this version.
+
+The canonical record of completed and planned functionality is [`FEATURES.md`](FEATURES.md). Items should only be marked implemented after the behavior exists in the current code and passes relevant validation.
 
 ## Visual direction
 
@@ -136,7 +142,7 @@ The central job record connects the experience:
 
 `job → mission → pipeline stage → XP/achievement → statistics`
 
-Suggested front-end state:
+Current front-end state:
 
 - `quest`: date, title, progress, completion status
 - `tasks`: mission type, job reference, label, time estimate, XP value, completed state
@@ -144,7 +150,7 @@ Suggested front-end state:
 - `jobs`: tracked job records and pipeline stages
 - `achievements`: definitions plus unlocked state
 
-Suggested reusable components:
+Primary interface regions:
 
 - App shell and top bar
 - Quest hero card
@@ -160,8 +166,9 @@ Suggested reusable components:
 - Apply missions validate that a job URL is present.
 - Incomplete metadata receives inline feedback instead of a disruptive error screen.
 - Buttons provide immediate pressed, active, or completed feedback.
-- No screen depends on network loading or external assets.
-- The footer provides separate Load demo data and Start fresh controls.
+- Core workflows do not depend on a backend or external API. Google Fonts may load from the network, with system-font fallbacks available.
+- The footer provides Export backup, Import backup, Load demo data, and Start fresh controls.
+- Import rejects malformed or incomplete JobQuest files and does not replace current data unless the user confirms.
 - Reload behavior preserves the current state in the browser; clearing site data or choosing Start fresh returns to the empty first-run state.
 
 ## Validation checklist
@@ -170,6 +177,7 @@ Suggested reusable components:
 - Load the optional demo data set.
 - Start a job-search mission.
 - Capture a job URL and job details.
+- Log a historical application with a prior application date and confirm it appears in the Application Log.
 - Complete Apply, Network, and Follow-up missions.
 - Update XP, streak, pipeline, and response statistics.
 - Unlock an achievement.
@@ -177,6 +185,7 @@ Suggested reusable components:
 - Search and filter the Application Log.
 - Change a tracked role’s pipeline stage.
 - Refresh and confirm local progress persists.
+- Export a backup, clear the app, import the backup, and confirm the tracked jobs and progress return.
 - Return to the fresh state.
 - Verify desktop and narrow-screen layouts.
 

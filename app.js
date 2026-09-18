@@ -26,9 +26,9 @@ const defaultState = {
     { key: "Interview", count: 1, color: "#eabf69" },
   ],
   jobs: [
-    { id: "northstar", title: "Product Design Lead", company: "Northstar", category: "Product design", location: "New York / Hybrid", source: "Referral", stage: "Applied", initials: "NS", trackedDate: "Aug 18, 2026", url: "https://northstar.example/jobs/product-design-lead", nextAction: "Send referral message", dueDate: "2026-08-26", notes: "Ask Maya for an introduction to the design director." },
-    { id: "loom", title: "Product Designer", company: "Loom", category: "Product design", location: "Remote", source: "LinkedIn", stage: "Screen", initials: "LO", trackedDate: "Aug 20, 2026", url: "https://loom.example/careers/product-designer", nextAction: "Follow up with recruiter", dueDate: "2026-08-26", notes: "Send a concise follow-up with the case study link." },
-    { id: "airtable", title: "Growth Designer", company: "Airtable", category: "Growth design", location: "San Francisco / Hybrid", source: "Company site", stage: "Saved", initials: "AT", trackedDate: "Aug 22, 2026", url: "https://airtable.example/jobs/growth-designer", nextAction: "Tailor résumé", dueDate: "", notes: "Highlight activation and onboarding experiments." },
+    { id: "northstar", title: "Product Design Lead", company: "Northstar", category: "Product design", location: "New York / Hybrid", source: "Referral", stage: "Applied", initials: "NS", trackedDate: "Aug 18, 2026", applicationDate: "2026-08-18", url: "https://northstar.example/jobs/product-design-lead", nextAction: "Send referral message", dueDate: "2026-08-26", notes: "Ask Maya for an introduction to the design director." },
+    { id: "loom", title: "Product Designer", company: "Loom", category: "Product design", location: "Remote", source: "LinkedIn", stage: "Screen", initials: "LO", trackedDate: "Aug 20, 2026", applicationDate: "2026-08-20", url: "https://loom.example/careers/product-designer", nextAction: "Follow up with recruiter", dueDate: "2026-08-26", notes: "Send a concise follow-up with the case study link." },
+    { id: "airtable", title: "Growth Designer", company: "Airtable", category: "Growth design", location: "San Francisco / Hybrid", source: "Company site", stage: "Saved", initials: "AT", trackedDate: "Aug 22, 2026", applicationDate: "", url: "https://airtable.example/jobs/growth-designer", nextAction: "Tailor résumé", dueDate: "", notes: "Highlight activation and onboarding experiments." },
   ],
   tasks: [
     { id: "apply", kind: "Apply", title: "Product Designer", company: "Notion", category: "Product Design", location: "Remote", source: "Company site", stage: "Saved", time: "25 min", xp: 50, accent: "lime", status: "ready", jobId: null, note: "Your highest-fit role this morning." },
@@ -107,6 +107,7 @@ const elements = {
   dueCount: document.querySelector("#due-count"),
   editDialog: document.querySelector("#job-edit-dialog"),
   editForm: document.querySelector("#job-edit-form"),
+  importFile: document.querySelector("#import-data-file"),
   toast: document.querySelector("#toast"),
   roleCategory: document.querySelector("#role-category"),
   customCategoryWrap: document.querySelector("#custom-category-wrap"),
@@ -127,6 +128,7 @@ const getJob = (jobId) => state.jobs.find((job) => job.id === jobId);
 const getIncompleteTask = () => state.tasks.find((task) => task.status !== "completed");
 const responseRate = () => state.stats.applications ? Math.round((state.stats.responses / state.stats.applications) * 100) : 0;
 const stageOptions = ["Saved", "Referral", "Applied", "Screen", "Interview", "Offer", "Closed"];
+const applicationStages = ["Applied", "Screen", "Interview", "Offer", "Closed"];
 const presetRoleCategories = [
   "Product Design",
   "UX/UI Design",
@@ -151,6 +153,60 @@ const presetRoleCategories = [
 function persistState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
+function exportState() {
+  const backup = {
+    app: "JobQuest",
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    data: cloneState(state),
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "jobquest-backup-" + getLocalDateKey() + ".json";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 0);
+  showToast("JobQuest backup exported.");
+}
+
+function validateBackup(backup) {
+  if (!backup || backup.app !== "JobQuest" || backup.version !== 1 || !backup.data || typeof backup.data !== "object") throw new Error("Choose a JobQuest backup file.");
+  const imported = backup.data;
+  const validJob = (job) => job && typeof job.id === "string" && typeof job.title === "string" && typeof job.company === "string" && stageOptions.includes(job.stage);
+  const validTask = (task) => task && typeof task.id === "string" && ["Apply", "Network", "Follow up"].includes(task.kind) && ["ready", "active", "completed"].includes(task.status);
+  const validPipeline = (stage) => stage && typeof stage.key === "string" && typeof stage.count === "number" && typeof stage.color === "string";
+  if (!Array.isArray(imported.jobs) || !imported.jobs.every(validJob) || !Array.isArray(imported.tasks) || !imported.tasks.every(validTask) || !Array.isArray(imported.pipeline) || !imported.pipeline.every(validPipeline) || !Array.isArray(imported.achievements) || !imported.stats || typeof imported.stats !== "object") throw new Error("That file is not a complete JobQuest backup.");
+  const freshState = cloneState(emptyState);
+  return {
+    ...freshState,
+    ...imported,
+    stats: { ...freshState.stats, ...imported.stats },
+    customCategories: Array.isArray(imported.customCategories) ? imported.customCategories : [],
+    jobs: imported.jobs.map((job) => ({ ...job, applicationDate: job.applicationDate || "" })),
+    tasks: imported.tasks,
+    pipeline: imported.pipeline,
+    achievements: imported.achievements,
+  };
+}
+
+async function importState(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  try {
+    const backup = JSON.parse(await file.text());
+    const importedState = validateBackup(backup);
+    if (!window.confirm("Importing this backup will replace the JobQuest data in this browser. Continue?")) return;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(importedState));
+    window.location.reload();
+  } catch (error) {
+    showToast(error instanceof SyntaxError ? "That file is not valid JSON." : error.message || "Import failed.");
+  } finally {
+    event.target.value = "";
+  }
+}
 
 function syncUserStats() {
   if (state.isDemo) return;
@@ -162,7 +218,7 @@ function syncUserStats() {
   state.stats.roleMix = Object.entries(categoryCounts)
     .sort(([, firstCount], [, secondCount]) => secondCount - firstCount)
     .map(([label, count]) => ({ label, value: Math.round((count / trackedJobCount) * 100) }));
-  state.stats.applications = state.jobs.filter((job) => ["Applied", "Screen", "Interview", "Offer", "Closed"].includes(job.stage)).length;
+  state.stats.applications = state.jobs.filter((job) => applicationStages.includes(job.stage)).length;
   state.stats.responses = state.jobs.filter((job) => ["Screen", "Interview", "Offer"].includes(job.stage)).length;
   state.stats.interviews = state.jobs.filter((job) => ["Interview", "Offer"].includes(job.stage)).length;
 }
@@ -268,7 +324,7 @@ function renderJobLog() {
   const query = elements.logSearch.value.trim().toLowerCase();
   const filter = elements.logFilter.value;
   const filteredJobs = [...state.jobs].reverse().filter((job) => {
-    const searchableText = `${job.title} ${job.company} ${job.category} ${job.nextAction || ""} ${job.notes || ""}`.toLowerCase();
+    const searchableText = `${job.title} ${job.company} ${job.category} ${job.nextAction || ""} ${job.notes || ""} ${job.applicationDate || ""} ${formatDateLabel(job.applicationDate, "")}`.toLowerCase();
     const matchesQuery = !query || searchableText.includes(query);
     const matchesFilter = filter === "all" || (filter === "active" ? !["Offer", "Closed"].includes(job.stage) : job.stage === filter);
     return matchesQuery && matchesFilter;
@@ -284,7 +340,8 @@ function renderJobLog() {
     const sourceLabel = job.source === "Company site" ? "Company careers page" : job.source || "Other";
     const nextAction = job.nextAction || "No next action";
     const dueLabel = job.dueDate ? `Due ${formatDateLabel(job.dueDate)}` : "No due date";
-    return `<div class="log-row"><div class="log-role"><span class="log-company-mark">${escapeHtml(job.initials || job.company.slice(0, 2).toUpperCase())}</span><div class="log-role-copy"><strong>${escapeHtml(job.title)}</strong><span>${escapeHtml(job.company)} · ${escapeHtml(job.category)}</span><span class="log-next-action">Next: ${escapeHtml(nextAction)} · ${escapeHtml(dueLabel)}</span></div></div><div class="log-cell"><span>PIPELINE STAGE</span><select class="stage-select" data-stage-job="${escapeHtml(job.id)}" aria-label="Update stage for ${escapeHtml(job.title)} at ${escapeHtml(job.company)}">${options}</select></div><div class="log-cell"><span>SOURCE</span><strong>${escapeHtml(sourceLabel)}</strong></div><div class="log-cell"><span>TRACKED</span><strong>${escapeHtml(job.trackedDate || "Today")}</strong></div><div class="log-actions">${postLink}<button class="log-edit" type="button" data-edit-job="${escapeHtml(job.id)}">Edit</button></div></div>`;
+    const applicationDate = formatDateLabel(job.applicationDate, "Not recorded");
+    return `<div class="log-row"><div class="log-role"><span class="log-company-mark">${escapeHtml(job.initials || job.company.slice(0, 2).toUpperCase())}</span><div class="log-role-copy"><strong>${escapeHtml(job.title)}</strong><span>${escapeHtml(job.company)} · ${escapeHtml(job.category)}</span><span class="log-next-action">Next: ${escapeHtml(nextAction)} · ${escapeHtml(dueLabel)}</span></div></div><div class="log-cell"><span>PIPELINE STAGE</span><select class="stage-select" data-stage-job="${escapeHtml(job.id)}" aria-label="Update stage for ${escapeHtml(job.title)} at ${escapeHtml(job.company)}">${options}</select></div><div class="log-cell"><span>SOURCE</span><strong>${escapeHtml(sourceLabel)}</strong></div><div class="log-cell"><span>APPLICATION DATE</span><strong>${escapeHtml(applicationDate)}</strong><em class="log-tracked-date">Tracked ${escapeHtml(job.trackedDate || "Today")}</em></div><div class="log-actions">${postLink}<button class="log-edit" type="button" data-edit-job="${escapeHtml(job.id)}">Edit</button></div></div>`;
   }).join("");
 }
 
@@ -295,10 +352,10 @@ function getLocalDateKey(date = new Date()) {
   return `${year}-${month}-${day}`;
 }
 
-function formatDateLabel(value) {
-  if (!value) return "No due date";
+function formatDateLabel(value, emptyLabel = "No due date") {
+  if (!value) return emptyLabel;
   const date = new Date(`${value}T12:00:00`);
-  return Number.isNaN(date.getTime()) ? "No due date" : date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return Number.isNaN(date.getTime()) ? emptyLabel : date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
 function renderDueToday() {
@@ -375,7 +432,7 @@ function openMission(taskId) {
   elements.dialog.dataset.taskId = task.id;
   document.querySelector("#dialog-kicker").textContent = `${task.kind.toUpperCase()} MISSION`;
   document.querySelector("#dialog-title").textContent = task.kind === "Apply" ? "Track this job" : `${task.kind} ${task.kind === "Network" ? "this contact" : "this opportunity"}`;
-  document.querySelector("#dialog-intro").textContent = task.kind === "Apply" ? "Paste the job post you’re applying for. JobQuest will keep the opportunity connected to your progress." : `Keep ${task.company} moving through your job-search pipeline. Choose the opportunity you want to update.`;
+  document.querySelector("#dialog-intro").textContent = task.kind === "Apply" ? "Paste the job post you’re applying for. If you already applied, choose Applied and add the real application date." : `Keep ${task.company} moving through your job-search pipeline. Choose the opportunity you want to update.`;
   document.querySelector("#capture-fields").hidden = task.kind !== "Apply";
   document.querySelector("#select-fields").hidden = task.kind === "Apply";
   document.querySelector("#dialog-submit").innerHTML = "Start mission <span>↗</span>";
@@ -389,7 +446,10 @@ function openMission(taskId) {
     setFieldValue("job-source", task.source);
     setFieldValue("job-next-action", task.nextAction || "Apply");
     setFieldValue("job-due-date", task.dueDate);
+    setFieldValue("job-application-date", task.applicationDate);
+    setFieldValue("job-stage", task.stage || "Saved");
     setFieldValue("job-notes", task.notes);
+    document.querySelector("#job-application-date").max = getLocalDateKey();
   } else {
     const jobSelect = document.querySelector("#existing-job");
     jobSelect.innerHTML = state.jobs.map((job) => `<option value="${escapeHtml(job.id)}" ${job.id === task.jobId ? "selected" : ""}>${escapeHtml(job.title)} at ${escapeHtml(job.company)} · ${escapeHtml(job.stage)}</option>`).join("");
@@ -409,9 +469,11 @@ function openJobEditor(jobId) {
   setFieldValue("edit-job-location", job.location);
   setFieldValue("edit-job-next-action", job.nextAction || "Apply");
   setFieldValue("edit-job-due-date", job.dueDate);
+  setFieldValue("edit-job-application-date", job.applicationDate);
   setFieldValue("edit-job-source", job.source || "Other");
   setFieldValue("edit-job-stage", job.stage);
   setFieldValue("edit-job-notes", job.notes);
+  document.querySelector("#edit-job-application-date").max = getLocalDateKey();
   document.querySelector("#edit-url-error").textContent = "";
   elements.editDialog.showModal();
 }
@@ -447,6 +509,7 @@ function startMission(event) {
       elements.customCategoryInput.focus();
       return;
     }
+    const startingStage = document.querySelector("#job-stage").value || "Saved";
     const newJob = {
       id: `tracked-${Date.now()}`,
       title: document.querySelector("#job-title").value.trim() || "Product Designer",
@@ -456,37 +519,42 @@ function startMission(event) {
       source: document.querySelector("#job-source").value,
       nextAction: document.querySelector("#job-next-action").value,
       dueDate: document.querySelector("#job-due-date").value,
+      applicationDate: document.querySelector("#job-application-date").value,
       notes: document.querySelector("#job-notes").value.trim(),
-      stage: "Saved",
+      stage: startingStage,
       initials: (document.querySelector("#company-name").value.trim() || "NC").slice(0, 2).toUpperCase(),
-      trackedDate: "Aug 25, 2026",
+      trackedDate: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
       url,
     };
     state.isDemo = false;
     rememberCustomCategory(category);
     state.jobs.push(newJob);
-    adjustPipelineStage("Saved", 1);
+    adjustPipelineStage(newJob.stage, 1);
     task.jobId = newJob.id;
     task.title = newJob.title;
     task.company = newJob.company;
     task.category = newJob.category;
     task.location = newJob.location;
     task.source = newJob.source;
+    task.stage = newJob.stage;
     task.nextAction = newJob.nextAction;
     task.dueDate = newJob.dueDate;
+    task.applicationDate = newJob.applicationDate;
     task.notes = newJob.notes;
     if (state.tasks.length === 1) addFollowOnTasks(newJob);
   } else {
     state.isDemo = false;
     task.jobId = document.querySelector("#existing-job").value;
   }
-  task.status = "active";
+  const isBackfilledApplication = task.kind === "Apply" && applicationStages.includes(task.stage);
+  task.status = isBackfilledApplication ? "completed" : "active";
+  if (isBackfilledApplication) state.newApplications += 1;
   syncUserStats();
   updateAchievements();
   persistState();
   elements.dialog.close();
   renderAll();
-  showToast(`${task.kind} mission started — make the next move.`);
+  showToast(isBackfilledApplication ? "Application logged — no XP awarded for backfilled activity." : `${task.kind} mission started — make the next move.`);
 }
 
 function saveJobEdits(event) {
@@ -507,6 +575,7 @@ function saveJobEdits(event) {
   job.location = document.querySelector("#edit-job-location").value.trim() || "Location to confirm";
   job.nextAction = document.querySelector("#edit-job-next-action").value || "Other";
   job.dueDate = document.querySelector("#edit-job-due-date").value;
+  job.applicationDate = document.querySelector("#edit-job-application-date").value;
   job.source = document.querySelector("#edit-job-source").value || "Other";
   job.notes = document.querySelector("#edit-job-notes").value.trim();
   job.initials = job.company.slice(0, 2).toUpperCase();
@@ -548,7 +617,7 @@ function completeTask(taskId) {
 function updateAchievements() {
   const achievementMap = {
     "First Application": state.jobs.length >= 1,
-    "Five Strong Applications": state.newApplications >= 5,
+    "Five Strong Applications": state.jobs.filter((job) => applicationStages.includes(job.stage)).length >= 5,
     "Follow-Up Finisher": state.stats.followups >= 10,
     "Interview Ready": state.stats.interviews >= 3,
     "Role Explorer": new Set(state.jobs.map((job) => job.category)).size >= 3,
@@ -619,6 +688,9 @@ document.addEventListener("change", (event) => {
 });
 elements.logSearch.addEventListener("input", renderJobLog);
 document.querySelector("#load-demo").addEventListener("click", loadDemoState);
+document.querySelector("#export-data").addEventListener("click", exportState);
+document.querySelector("#import-data").addEventListener("click", () => elements.importFile.click());
+elements.importFile.addEventListener("change", importState);
 document.querySelector("#reset-demo").addEventListener("click", () => {
   localStorage.removeItem(STORAGE_KEY);
   window.location.reload();

@@ -15,12 +15,16 @@ JobQuest is a responsive front-end prototype for people who want the job search 
 - Optional demo data for walkthroughs and visual review.
 - Job tracking by pasted job-post URL, title, company, role category, location, and source.
 - Preset role categories plus custom categories that are saved for reuse.
+- Historical application backfill: choose the current pipeline stage and record the actual application date, including a prior date.
 - Next action, due date, and notes for each tracked opportunity.
 - Application Log search, pipeline-stage filtering, stage updates, detail editing, and job-post links.
 - Due today view for opportunities with a next action scheduled for the current date.
 - Role mix, application, interview, follow-up, pipeline, XP, streak, and achievement feedback.
 - Responsive layout for desktop and narrow screens.
 - Browser-local persistence through `localStorage`.
+- One-click JSON backup export and validated import with confirmation before replacing current browser data.
+
+The maintained implementation and roadmap checklist is in [`FEATURES.md`](FEATURES.md).
 
 ## Run it locally
 
@@ -41,9 +45,11 @@ If Python is not available, serve the repository root with any static HTTP serve
 3. Paste a real job-post URL and add the role details.
 4. Choose a preset role category, or select **Add custom category…** to create one that will be available again later.
 5. Add a next action, due date, and notes if useful.
-6. Start the mission. JobQuest adds the opportunity to the log and creates related networking and follow-up missions.
-7. Use **Application log** to search, filter, change pipeline stage, edit details, or open the saved post.
-8. Use **Due today**, **Role mix**, and **Achievements** to review the search without losing the next action.
+6. If you already applied, choose the current stage (such as Applied) and enter the actual application date. Leave the date blank when you are still preparing.
+7. Start the mission. Historical applications are logged without awarding retroactive XP; new Saved opportunities remain active missions.
+8. Use **Application log** to search, filter, change pipeline stage, edit details, backdate an application, or open the saved post.
+9. Use **Export backup** before changing browsers or clearing site data. Use **Import backup** to restore a validated JobQuest JSON file; importing replaces the current browser state only after confirmation.
+10. Use **Due today**, **Role mix**, and **Achievements** to review the search without losing the next action.
 
 For a guided walkthrough, select **Load demo data** in the footer. Select **Start fresh** to return to the empty first-run state.
 
@@ -59,7 +65,7 @@ The lint script runs Node’s syntax check against `app.js`. There is currently 
 
 ## Data and privacy boundary
 
-Tracked jobs are stored only in the current browser under the `jobquest-state-v2` localStorage key. There is no account system, cloud sync, server database, URL scraping, or third-party API call in this prototype. Use fictional or non-sensitive data when sharing a demo browser profile.
+Tracked jobs are stored only in the current browser under the `jobquest-state-v2` localStorage key. Exported backups download as JSON files to your device, and imports are validated locally before replacing browser data. There is no account system, cloud sync, server database, URL scraping, or third-party API call in this prototype. Use fictional or non-sensitive data when sharing a demo browser profile.
 
 The demo records use example URLs and fictional sample opportunities. They are included to make the interface easy to review and are not live job listings.
 
@@ -69,6 +75,7 @@ The demo records use example URLs and fictional sample opportunities. They are i
 .
 ├── README.md                      # Project overview and setup
 ├── DESIGN.md                      # Product, UX, visual, and validation decisions
+├── FEATURES.md                    # Implemented features and prioritized roadmap
 ├── index.html                     # App shell and accessible markup
 ├── styles.css                     # Visual system and responsive layout
 ├── app.js                         # State, rendering, persistence, and interactions
@@ -81,6 +88,6 @@ The demo records use example URLs and fictional sample opportunities. They are i
 
 The core promise is: **make the job search easier to do, not just easier to organize.** The visual language is sleek editorial utility—graphite structure, cool porcelain surfaces, aqua progress signals, coral follow-up cues, and crisp typographic hierarchy.
 
-The next product-level step is validating the flow with real job seekers. The next technical step after that would be authenticated cloud persistence, followed by reminders and optional job-post metadata extraction.
+The next product-level step is validating the flow with real job seekers. With portable JSON backup now available, the highest-priority technical work is date reliability, CSV export, automated tests, and authenticated cloud persistence.
 
-More detailed product decisions and the current validation checklist live in [`DESIGN.md`](DESIGN.md).
+See [`FEATURES.md`](FEATURES.md) for the current build checklist and [`DESIGN.md`](DESIGN.md) for the product decisions and validation plan.
